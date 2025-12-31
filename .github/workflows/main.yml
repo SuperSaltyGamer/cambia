@@ -1,5 +1,8 @@
 name: Build cambia
-on: 
+on:
+  push:
+    tags:
+      - 'v*'
   workflow_dispatch:
 
 jobs:
@@ -46,3 +49,35 @@ jobs:
         with:
           name: cambia-${{ matrix.os }}
           path: target/release/cambia${{ matrix.os == 'windows-latest' && '.exe' || '' }}
+
+  release:
+    name: Create GitHub Release
+    needs: cargo
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Linux binary
+        uses: actions/download-artifact@v4
+        with:
+          name: cambia-ubuntu-latest
+          path: dist/linux
+      - name: Download Windows binary
+        uses: actions/download-artifact@v4
+        with:
+          name: cambia-windows-latest
+          path: dist/windows
+      - name: Download macOS binary
+        uses: actions/download-artifact@v4
+        with:
+          name: cambia-macos-latest
+          path: dist/macos
+      - name: Rename binaries
+        run: |
+          mv dist/linux/cambia dist/cambia-linux
+          mv dist/windows/cambia.exe dist/cambia-windows.exe
+          mv dist/macos/cambia dist/cambia-macos
+      - name: Create release and upload assets
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Cambia ${{ github.ref_name }}
+          files: dist/*
