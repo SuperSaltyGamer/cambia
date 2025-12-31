@@ -16,7 +16,7 @@ jobs:
         with:
           node-version: '21'
       - name: Install dependencies
-        run: npm install
+        run: npm ci
         working-directory: web
       - name: Generate the static site
         run: npm run build
