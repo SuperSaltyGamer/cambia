@@ -33,7 +33,21 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            artifact_name: cambia-linux-amd64
+            binary_name: cambia
+          - os: ubuntu-24.04-arm
+            artifact_name: cambia-linux-arm64
+          - os: windows-latest
+            artifact_name: cambia-windows-amd64.exe
+            binary_name: cambia.exe
+          - os: macos-latest
+            artifact_name: cambia-macos-arm64
+            binary_name: cambia
+          - os: macos-13
+            artifact_name: cambia-macos-amd64
+            binary_name: cambia
     steps:
       - uses: actions/checkout@v4
       - name: Download static site files
@@ -47,8 +61,8 @@ jobs:
       - name: Upload binaries
         uses: actions/upload-artifact@v4
         with:
-          name: cambia-${{ matrix.os }}
-          path: target/release/cambia${{ matrix.os == 'windows-latest' && '.exe' || '' }}
+          name: ${{ matrix.artifact_name }}
+          path: target/release/${{ matrix.binary_name }}
 
   release:
     if: startsWith(github.ref, 'refs/tags/')
@@ -56,27 +70,13 @@ jobs:
     needs: cargo
     runs-on: ubuntu-latest
     steps:
-      - name: Download Linux binary
+      - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          name: cambia-ubuntu-latest
-          path: dist/linux
-      - name: Download Windows binary
-        uses: actions/download-artifact@v4
-        with:
-          name: cambia-windows-latest
-          path: dist/windows
-      - name: Download macOS binary
-        uses: actions/download-artifact@v4
-        with:
-          name: cambia-macos-latest
-          path: dist/macos
-      - name: Rename binaries
-        run: |
-          mv dist/linux/cambia dist/cambia-linux
-          mv dist/windows/cambia.exe dist/cambia-windows.exe
-          mv dist/macos/cambia dist/cambia-macos
-      - name: Create release and upload assets
+          path: dist
+          pattern: cambia-*
+          merge-multiple: true
+      - name: Create release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
