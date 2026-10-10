@@ -28,9 +28,7 @@ lazy_static! {
 
 // Rip prints AccurateRip checksums sign-extended to 64 bits
 fn low32(hex: &str) -> String {
-    let s = hex.trim_start_matches('0');
-    let take = s.len().min(8);
-    hex[hex.len() - take.max(1).min(hex.len())..].to_uppercase()
+    format!("{:08X}", u64::from_str_radix(hex, 16).unwrap_or_default() as u32)
 }
 
 pub struct RipParser {
