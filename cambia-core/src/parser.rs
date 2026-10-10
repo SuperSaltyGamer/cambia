@@ -26,6 +26,7 @@ pub mod ezcd_parser;
 #[cfg(feature = "freac")]
 pub mod freac_parser;
 
+use regex::Regex;
 use serde::{Serialize, Deserialize};
 use ts_rs::TS;
 
@@ -123,4 +124,15 @@ pub trait ParserTrack: TrackExtractor {
             ar_info: self.extract_ar_info(),
         }
     }
+}
+
+pub fn split_tracks<'a>(log: &'a str, regex: &Regex) -> Vec<(u8, &'a str)> {
+    let starts: Vec<(usize, u8)> = regex.captures_iter(log)
+        .map(|captures| (captures.get(0).unwrap().start(), captures.get(1).unwrap().as_str().parse::<u8>().unwrap_or_default()))
+        .collect();
+
+    starts.iter().enumerate().map(|(idx, &(start, num))| {
+        let end = starts.get(idx + 1).map_or(log.len(), |&(next, _)| next);
+        (num, &log[start..end])
+    }).collect()
 }
