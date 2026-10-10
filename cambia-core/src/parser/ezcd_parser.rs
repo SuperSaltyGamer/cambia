@@ -15,7 +15,7 @@ lazy_static! {
     // Device: [ F: ] ASUS DRW-24D5MT 2.00  -- the trailing firmware is not
     // part of the AccurateRip name, and neither is the mount point
     static ref DEVICE: Regex = Regex::new(r"(?m)^Device:\s*(?:\[[^\]]*\])?\s*(.+?)\s*$").unwrap();
-    static ref FIRMWARE: Regex = Regex::new(r"\s+[0-9]+\.[0-9]+$").unwrap();
+    static ref FIRMWARE: Regex = Regex::new(r"\s+[0-9A-Za-z.]{4}$").unwrap();
     static ref SETTING: Regex = Regex::new(r"(?m)^(?P<key>[^:\n]+?)\s*:+\s*(?P<value>.+?)\s*$").unwrap();
 
     static ref TOC_ROW: Regex = Regex::new(
@@ -25,7 +25,7 @@ lazy_static! {
     static ref PREEMPH: Regex = Regex::new(r"(Yes|No)\s*$").unwrap();
 
     static ref SUMMARY_ROW: Regex = Regex::new(
-        r#"(?m)^\s*(?P<track>\d+)\s+(?P<status>\S+)\s+(?P<copy>[0-9A-Fa-f]{8})(?:\s+(?P<test>[0-9A-Fa-f]{8}))?\s+(?P<errors>\d+)\s+"(?P<file>.*)""#
+        r#"(?m)^\s*(?P<track>\d+)\s+(?P<status>\S+)\s+(?P<copy>[0-9A-Fa-f]{8})(?:\s+(?P<test>[0-9A-Fa-f]{8}))?\s+(?P<errors>\d+(?:\s+\d+)*)\s+"(?P<file>.*)""#
     ).unwrap();
 }
 
@@ -171,8 +171,13 @@ impl Extractor for EzcdParserSingle {
         self.enabled("Verify audio")
     }
 
+    /// Only "Apply ReplayGain" alters the audio, and 10.3.0 does not log it;
+    /// gain that was never calculated cannot have been applied either.
     fn extract_normalize(&self) -> Quartet {
-        self.enabled("Calculate ReplayGain")
+        match (self.enabled("Apply ReplayGain"), self.enabled("Calculate ReplayGain")) {
+            (Quartet::Unknown, Quartet::False) => Quartet::False,
+            (apply, _) => apply,
+        }
     }
 
     fn extract_audio_encoder(&self) -> Vec<String> {
