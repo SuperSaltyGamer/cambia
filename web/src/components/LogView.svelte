@@ -11,7 +11,7 @@
 	import ReleaseInfo from './ReleaseInfo.svelte';
 	import ChecksumInfo from './ChecksumInfo.svelte';
 	import TrackInfo from './TrackInfo.svelte';
-	import type { CambiaResponse } from '$lib/types/CambiaResponse';
+	import type { CambiaResponse } from '#lib/types/CambiaResponse.js';
 	import { onMount } from 'svelte';
 	import AccurateRipSummary from './AccurateRipSummary.svelte';
 
@@ -91,7 +91,10 @@
 						bind:value={inputPage}
 						class="w-12 h-8 border-0 preset-filled py-1.5 text-center text-sm rounded-l-full"
 						onkeypress={pageInputHandler}
-						onclick={(e) => { e.preventDefault(); selectText(); }}
+						onclick={(e) => {
+							e.preventDefault();
+							selectText();
+						}}
 						bind:this={inputEl}
 					/>
 					<button

@@ -1,18 +1,18 @@
 <script lang="ts">
-    import type { EvaluatorType } from "$lib/types/EvaluatorType";
-    import IconUnknown from '~icons/carbon/unknown';
-    import Orpheus from "../../icons/Orpheus.svelte";
-    import type { IconComponent } from "$lib/types/IconComponent";
+	import type { EvaluatorType } from '#lib/types/EvaluatorType.js';
+	import IconUnknown from '~icons/carbon/unknown';
+	import Orpheus from '../../icons/Orpheus.svelte';
+	import type { IconComponent } from '#lib/types/IconComponent.js';
 
-    interface Props {
-        evaluator: EvaluatorType;
-    }
+	interface Props {
+		evaluator: EvaluatorType;
+	}
 
-    let { evaluator }: Props = $props();
+	let { evaluator }: Props = $props();
 
-    const Icon: IconComponent = $derived(evaluator === "OPS" ? Orpheus : IconUnknown);
+	const Icon: IconComponent = $derived(evaluator === 'OPS' ? Orpheus : IconUnknown);
 </script>
 
 <div class="w-6">
-    <Icon />
+	<Icon />
 </div>

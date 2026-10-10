@@ -1,7 +1,7 @@
 // Lightswitch Service
 
 import { get } from 'svelte/store';
-import { localStorageStore } from '$lib/LocalStorageStore';
+import { localStorageStore } from '#lib/LocalStorageStore.js';
 
 // Stores ---
 // TRUE: light, FALSE: dark

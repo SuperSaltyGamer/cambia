@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { TrackEntry } from '$lib/types/TrackEntry';
+	import type { TrackEntry } from '#lib/types/TrackEntry.js';
 	import AccurateRipChecksumSegment from './frags/AccurateRipChecksumSegment.svelte';
 	import InfoSegment from './frags/InfoSegment.svelte';
 

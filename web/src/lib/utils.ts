@@ -47,7 +47,11 @@ export async function copyToClipboard(value: string): Promise<boolean> {
 }
 
 export function getCssColor(cssVar: string): Color {
-	return new Color(getComputedStyle(document.documentElement).getPropertyValue('--' + cssVar).trim());
+	return new Color(
+		getComputedStyle(document.documentElement)
+			.getPropertyValue('--' + cssVar)
+			.trim()
+	);
 }
 
 export function getCssColorHex(cssVar: string): string {

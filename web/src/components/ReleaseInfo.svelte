@@ -1,40 +1,45 @@
 <script lang="ts">
-    import Card from "./frags/Card.svelte";
-	import { getReleasesFromDiscId } from '$lib/api/MusicBrainzApi';
+	import Card from './frags/Card.svelte';
+	import { getReleasesFromDiscId } from '#lib/api/MusicBrainzApi.js';
 	import type { IRelease } from 'musicbrainz-api';
-	import { castToTypeArray } from '$lib/utils';
-	import type { ReleaseInfo } from "$lib/types/ReleaseInfo";
-	import ReleaseInfoSegment from "./frags/ReleaseInfoSegment.svelte";
+	import { castToTypeArray } from '#lib/utils.js';
+	import type { ReleaseInfo } from '#lib/types/ReleaseInfo.js';
+	import ReleaseInfoSegment from './frags/ReleaseInfoSegment.svelte';
 
-    interface Props {
-        mbzTocId: string;
-        logRelease: ReleaseInfo;
-    }
+	interface Props {
+		mbzTocId: string;
+		logRelease: ReleaseInfo;
+	}
 
-    let { mbzTocId, logRelease }: Props = $props();
+	let { mbzTocId, logRelease }: Props = $props();
 
-    const res = (async () => {
-        const _res = await getReleasesFromDiscId(mbzTocId);
-        return await _res.json();
-    })();
+	const res = (async () => {
+		const _res = await getReleasesFromDiscId(mbzTocId);
+		return await _res.json();
+	})();
 
-    function castToReleases(releases: object): IRelease[] {
-        return castToTypeArray<IRelease>(releases);
-    }
+	function castToReleases(releases: object): IRelease[] {
+		return castToTypeArray<IRelease>(releases);
+	}
 </script>
 
 {#if mbzTocId}
-    <Card header="Release Info" addClass="col-span-2 h-1/4">
-        {#await res}
-            <ReleaseInfoSegment relLog={logRelease} pending={true} />
-        {:then data}
-            {#if !data.error && data.releases.length > 0}
-                <ReleaseInfoSegment rels={castToReleases(data.releases)} relLog={logRelease} mbzTocId={mbzTocId} pending={true} />
-            {:else}
-                <ReleaseInfoSegment relLog={logRelease} />
-            {/if}
-        {:catch}
-            <ReleaseInfoSegment relLog={logRelease} />
-        {/await}
-    </Card>
+	<Card header="Release Info" addClass="col-span-2 h-1/4">
+		{#await res}
+			<ReleaseInfoSegment relLog={logRelease} pending={true} />
+		{:then data}
+			{#if !data.error && data.releases.length > 0}
+				<ReleaseInfoSegment
+					rels={castToReleases(data.releases)}
+					relLog={logRelease}
+					{mbzTocId}
+					pending={true}
+				/>
+			{:else}
+				<ReleaseInfoSegment relLog={logRelease} />
+			{/if}
+		{:catch}
+			<ReleaseInfoSegment relLog={logRelease} />
+		{/await}
+	</Card>
 {/if}

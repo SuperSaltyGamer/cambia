@@ -24,18 +24,22 @@ export const processing = writable(false);
  * An empty FileList rather than undefined, so `bind:files` clears the DOM too.
  */
 export function clearFileList() {
-	if (typeof DataTransfer === "undefined") return;
+	if (typeof DataTransfer === 'undefined') return;
 	fileListStore.set(new DataTransfer().files);
 }
 
 export function initialiseResponseStore(files: FileList | undefined) {
-    hashIndexLookup.clear();
-    processedCount.set(0);
-    perfectCount.set(0);
-    warningCount.set(0);
-    badCount.set(0);
-    unknownCount.set(0);
-    responseStore.set(Array.from(files || []).map(file => <ResponseEntry> {filename: file.name, status: "queued", content: null}));
+	hashIndexLookup.clear();
+	processedCount.set(0);
+	perfectCount.set(0);
+	warningCount.set(0);
+	badCount.set(0);
+	unknownCount.set(0);
+	responseStore.set(
+		Array.from(files || []).map(
+			(file) => <ResponseEntry>{ filename: file.name, status: 'queued', content: null }
+		)
+	);
 }
 
 export function inputChanged(from: string | null) {

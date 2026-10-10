@@ -1,25 +1,32 @@
-<script lang='ts'>
+<script lang="ts">
 	import '../app.css';
 
 	// Skeleton v5 dropped the lightswitch utilities; this repo already carries a
 	// copy of the v2 implementation, so the toggle keeps behaving as before.
-	import { modeCurrent, setModeUserPrefers, setModeCurrent } from '$lib/lightswitch';
+	import { modeCurrent, setModeUserPrefers, setModeCurrent } from '#lib/lightswitch.js';
 
 	import CambiaLogo from '../components/icons/CambiaLogo.svelte';
 	import IconHelp from '~icons/carbon/help';
 	import IconWindowBlackSaturation from '~icons/carbon/window-black-saturation';
 	import IconGithub from '~icons/carbon/logo-github';
-
-	import type { AfterNavigate } from '@sveltejs/kit';
-	import { afterNavigate, goto } from '$app/navigation';
+	import { afterNavigate, goto, type AfterNavigate } from '$app/navigation';
 	import DropScreen from '../components/frags/DropScreen.svelte';
-	import { errorStore, fileListStore, hashIndexLookup, clearFileList, inputChanged, processedCount, processing, responseStore} from '$lib/LogStore';
+	import {
+		errorStore,
+		fileListStore,
+		hashIndexLookup,
+		clearFileList,
+		inputChanged,
+		processedCount,
+		processing,
+		responseStore
+	} from '#lib/LogStore.js';
 	import { onMount } from 'svelte';
 	import { get } from 'svelte/store';
 	import { page } from '$app/state';
 
-	import type { CambiaError } from '$lib/types/CambiaError';
-	import { removeRoute } from '$lib/utils';
+	import type { CambiaError } from '#lib/types/CambiaError.js';
+	import { removeRoute } from '#lib/utils.js';
 	import LoadModal from '../components/frags/LoadModal.svelte';
 
 	interface Props {
@@ -40,6 +47,8 @@
 	}
 
 	afterNavigate((params: AfterNavigate) => {
+		if (params.shallow && params.type === 'goto') return;
+
 		const isNewPage = params.from?.url.pathname !== params.to?.url.pathname;
 		const elemPage = document.querySelector('#page');
 		if (isNewPage && elemPage !== null) elemPage.scrollTop = 0;
@@ -51,37 +60,42 @@
 	});
 
 	onMount(() => {
-		const unsubscribe = processedCount.subscribe(p => {
+		const unsubscribe = processedCount.subscribe((p) => {
 			// Only meaningful while an upload is running; subscribing replays the
 			// current value, and the store survives client-side navigation.
 			if (!get(processing) || $fileListStore?.length !== 1 || p !== 1) return;
 
 			processing.set(false);
 			switch ($responseStore[0].status) {
-				case "processed":
-					goto(`${removeRoute(location.pathname, page.route.id)}/log?id=${hashIndexLookup.keys().next().value}`);
+				case 'processed':
+					goto(
+						`${removeRoute(location.pathname, page.route.id)}/log?id=${hashIndexLookup.keys().next().value}`
+					);
 					break;
-				case "errored":
+				case 'errored':
 					errorStore.set($responseStore[0].content as CambiaError);
-					goto(`${removeRoute(location.pathname, page.route.id)}/error`)
+					goto(`${removeRoute(location.pathname, page.route.id)}/error`);
 					break;
 				default:
-					console.log("Error");
+					console.log('Error');
 					break;
 			}
 		});
 
 		// FIXME: Breaks if pasted in high frequency
-		document.addEventListener("paste", (ev) => {
+		document.addEventListener('paste', (ev) => {
 			const dt = ev.clipboardData;
 			const tmp_dt = new DataTransfer();
-			if (dt && !(ev.target instanceof HTMLInputElement || ev.target instanceof HTMLTextAreaElement)) {
-				if (dt.types.includes("text/plain")) {
-					const file = new File([dt.getData("text")], "pasted.log", {type: 'text/plain'});
+			if (
+				dt &&
+				!(ev.target instanceof HTMLInputElement || ev.target instanceof HTMLTextAreaElement)
+			) {
+				if (dt.types.includes('text/plain')) {
+					const file = new File([dt.getData('text')], 'pasted.log', { type: 'text/plain' });
 					tmp_dt.items.add(file);
 				} else {
 					for (const file of dt.files) {
-						if (file.name.endsWith(".log") || file.name.endsWith(".txt")) {
+						if (file.name.endsWith('.log') || file.name.endsWith('.txt')) {
 							tmp_dt.items.add(file);
 						}
 					}
@@ -100,7 +114,11 @@
 {/if}
 
 <!-- Skeleton v5 removed AppShell; this is the same three-region layout by hand. -->
-<div id="page" class="w-full h-full grid grid-rows-[auto_1fr_auto] overflow-y-auto overflow-x-hidden scroll-smooth" style="scrollbar-gutter: stable;">
+<div
+	id="page"
+	class="w-full h-full grid grid-rows-[auto_1fr_auto] overflow-y-auto overflow-x-hidden scroll-smooth"
+	style="scrollbar-gutter: stable;"
+>
 	<div class="sticky top-0 z-50 backdrop-blur-xl">
 		<header class="bg-primary-400/10 px-4 py-1">
 			<div class="flex items-center justify-between">
@@ -115,8 +133,15 @@
 				</div>
 				<div>
 					<div class="flex gap-x-0">
-						<a type="button" class="btn-icon hover:preset-tonal" href="{removeRoute(page.url.pathname, page.route.id)}/help"><IconHelp class="icon-lg" /></a>
-						<button type="button" class="btn-icon hover:preset-tonal" onclick={onToggleHandler}><IconWindowBlackSaturation class="icon-lg" /></button>
+						<a
+							type="button"
+							class="btn-icon hover:preset-tonal"
+							href="{removeRoute(page.url.pathname, page.route.id)}/help"
+							><IconHelp class="icon-lg" /></a
+						>
+						<button type="button" class="btn-icon hover:preset-tonal" onclick={onToggleHandler}
+							><IconWindowBlackSaturation class="icon-lg" /></button
+						>
 					</div>
 				</div>
 			</div>
@@ -129,7 +154,12 @@
 		AppShell used to provide it as <main>, which also restores the landmark.
 	-->
 	<main>
-		<DropScreen bind:files={$fileListStore} onchange={() => {inputChanged(page.route.id)}} >
+		<DropScreen
+			bind:files={$fileListStore}
+			onchange={() => {
+				inputChanged(page.route.id);
+			}}
+		>
 			{@render children?.()}
 		</DropScreen>
 	</main>
@@ -139,7 +169,11 @@
 				<CambiaLogo class="w-5 stroke-surface-300 dark:stroke-surface-400 stroke-1" />
 			</div>
 			<div>
-				<a href="https://github.com/rokkhonorg/cambia" class="btn-icon hover:preset-tonal" target="_blank"><IconGithub class="icon-lg" /></a>
+				<a
+					href="https://github.com/rokkhonorg/cambia"
+					class="btn-icon hover:preset-tonal"
+					target="_blank"><IconGithub class="icon-lg" /></a
+				>
 			</div>
 		</div>
 	</footer>

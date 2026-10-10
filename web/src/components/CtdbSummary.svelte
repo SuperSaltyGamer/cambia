@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Card from "./frags/Card.svelte";
+	import Card from './frags/Card.svelte';
 </script>
 
 <Card header="CTDB Summary">

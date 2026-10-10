@@ -1,30 +1,32 @@
 <script lang="ts">
-	import type { AccurateRipOffset } from "$lib/types/AccurateRipOffset";
-    import IconHashtag from '~icons/carbon/hashtag';
+	import type { AccurateRipOffset } from '#lib/types/AccurateRipOffset.js';
+	import IconHashtag from '~icons/carbon/hashtag';
 
-    interface Props {
-        header: string;
-        sign: string;
-        arOffset?: AccurateRipOffset | undefined;
-    }
+	interface Props {
+		header: string;
+		sign: string;
+		arOffset?: AccurateRipOffset | undefined;
+	}
 
-    let { header, sign, arOffset = undefined }: Props = $props();
-    const offset: number | null = $derived(
-        arOffset && arOffset !== "Same" ? arOffset.Different : null
-    );
+	let { header, sign, arOffset = undefined }: Props = $props();
+	const offset: number | null = $derived(
+		arOffset && arOffset !== 'Same' ? arOffset.Different : null
+	);
 </script>
 
 {#if sign}
-    <div class="flex flex-col gap-2">
-        <div class="flex items-center">
-            <div class="min-w-4">
-                <IconHashtag />
-            </div>
-            <span class="ml-1.5 dark:font-light text-sm">{header}</span>
-            {#if offset !== null}
-                <span class="ml-2 preset-tonal-primary rounded-md text-xs px-1.5 py-0.5 font-semibold">{offset}</span>
-            {/if}
-        </div>
-        <div class="font-mono grow bg-surface-50-900 px-2 py-1 truncate">{sign}</div>
-    </div>
+	<div class="flex flex-col gap-2">
+		<div class="flex items-center">
+			<div class="min-w-4">
+				<IconHashtag />
+			</div>
+			<span class="ml-1.5 dark:font-light text-sm">{header}</span>
+			{#if offset !== null}
+				<span class="ml-2 preset-tonal-primary rounded-md text-xs px-1.5 py-0.5 font-semibold"
+					>{offset}</span
+				>
+			{/if}
+		</div>
+		<div class="font-mono grow bg-surface-50-900 px-2 py-1 truncate">{sign}</div>
+	</div>
 {/if}

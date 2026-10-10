@@ -1,1 +1,3 @@
-export interface Indexable<T = unknown> { [key: string]: T }
+export interface Indexable<T = unknown> {
+	[key: string]: T;
+}
