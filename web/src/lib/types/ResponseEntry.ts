@@ -1,4 +1,8 @@
-import type { CambiaError } from "./CambiaError";
-import type { CambiaResponse } from "./CambiaResponse";
+import type { CambiaError } from './CambiaError';
+import type { CambiaResponse } from './CambiaResponse';
 
-export interface ResponseEntry { filename: string, status: string, content: CambiaResponse | CambiaError | null }
+export interface ResponseEntry {
+	filename: string;
+	status: string;
+	content: CambiaResponse | CambiaError | null;
+}

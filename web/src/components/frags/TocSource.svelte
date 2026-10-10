@@ -1,32 +1,38 @@
 <script lang="ts">
-    import IconArrowUpRight from '~icons/carbon/arrow-up-right';
-    import IconCopy from '~icons/carbon/copy';
-    import IconIbmCloudPakData from '~icons/carbon/ibm-cloud-pak-data';
-    import { clipboard } from '@skeletonlabs/skeleton';
-	import { copySuccess } from "$lib/utils";
-    import { getToastStore } from '@skeletonlabs/skeleton';
-	import type { ComponentType } from 'svelte';
+	import IconArrowUpRight from '~icons/carbon/arrow-up-right';
+	import IconIbmCloudPakData from '~icons/carbon/ibm-cloud-pak-data';
+	import CopyButton from './CopyButton.svelte';
+	import type { IconComponent } from '#lib/types/IconComponent.js';
 
-    const toastStore = getToastStore();
+	interface Props {
+		header: string;
+		discid: string;
+		url?: string;
+		icon?: IconComponent;
+	}
 
-    export let header: string;
-    export let discid: string;
-    export let url: string = "";
+	let { header, discid, url = '', icon = IconIbmCloudPakData }: Props = $props();
 
-    export let icon: ComponentType = IconIbmCloudPakData;
+	const SvelteComponent = $derived(icon);
 </script>
+
 <div class="flex flex-col">
-    <div class="flex items-center">
-        <div class="min-w-4">
-            <svelte:component this={icon} />
-        </div>
-        <span class="ml-1.5 dark:font-light text-sm">{header}</span>
-    </div>
-    <div class="flex items-center place-items-center justify-between">
-        <div class="font-mono grow bg-success-900 bg-surface-50-900-token px-2 py-1 truncate">{discid}</div>
-        <div class="flex">
-            <button type="button" class="btn-icon bg-initial hover:variant-soft" use:clipboard={discid} on:click={() => {copySuccess(toastStore)}}><IconCopy /></button>
-            <a type="button" class="btn-icon bg-initial hover:variant-soft {url ? "visible" : "invisible"}" href={url} target="_blank"><IconArrowUpRight /></a>
-        </div>
-    </div>
+	<div class="flex items-center">
+		<div class="min-w-4">
+			<SvelteComponent />
+		</div>
+		<span class="ml-1.5 dark:font-light text-sm">{header}</span>
+	</div>
+	<div class="flex items-center place-items-center justify-between">
+		<div class="font-mono grow bg-surface-50-900 px-2 py-1 truncate">{discid}</div>
+		<div class="flex">
+			<CopyButton value={discid} />
+			<a
+				type="button"
+				class="btn-icon hover:preset-tonal {url ? 'visible' : 'invisible'}"
+				href={url}
+				target="_blank"><IconArrowUpRight /></a
+			>
+		</div>
+	</div>
 </div>

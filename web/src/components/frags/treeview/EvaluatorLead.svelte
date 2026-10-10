@@ -1,23 +1,18 @@
 <script lang="ts">
-    import type { EvaluatorType } from "$lib/types/EvaluatorType";
-    import IconUnknown from '~icons/carbon/unknown';
-    import Orpheus from "../../icons/Orpheus.svelte";
-	import type { ComponentType } from "svelte";
+	import type { EvaluatorType } from '#lib/types/EvaluatorType.js';
+	import IconUnknown from '~icons/carbon/unknown';
+	import Orpheus from '../../icons/Orpheus.svelte';
+	import type { IconComponent } from '#lib/types/IconComponent.js';
 
-    export let evaluator: EvaluatorType;
+	interface Props {
+		evaluator: EvaluatorType;
+	}
 
-    let icon: ComponentType;
+	let { evaluator }: Props = $props();
 
-    switch (evaluator) {
-        case "OPS":
-            icon = Orpheus;
-            break;
-        default:
-            icon = IconUnknown;
-            break;
-    }
+	const Icon: IconComponent = $derived(evaluator === 'OPS' ? Orpheus : IconUnknown);
 </script>
 
 <div class="w-6">
-    <svelte:component this={icon} />
+	<Icon />
 </div>

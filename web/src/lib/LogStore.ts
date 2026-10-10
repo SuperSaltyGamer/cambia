@@ -3,6 +3,8 @@ import type { ResponseEntry } from './types/ResponseEntry';
 import type { CambiaResponse } from './types/CambiaResponse';
 import type { CambiaError } from './types/CambiaError';
 import { getRipInfoMpMulti } from './api/CambiaApi';
+import { goto } from '$app/navigation';
+import { removeRoute } from './utils';
 
 export const processedCount = writable(0);
 export const responseStore = writable(new Array<ResponseEntry>());
@@ -14,15 +16,30 @@ export const badCount = writable(0);
 export const unknownCount = writable(0);
 export const errorStore = writable<CambiaError | null>(null);
 export const fetchController = writable<AbortController>(new AbortController());
+/** True only while an upload is in flight, so a stale file list cannot drive routing. */
+export const processing = writable(false);
+
+/**
+ * Drops the pending selection, including whatever the file inputs still hold.
+ * An empty FileList rather than undefined, so `bind:files` clears the DOM too.
+ */
+export function clearFileList() {
+	if (typeof DataTransfer === 'undefined') return;
+	fileListStore.set(new DataTransfer().files);
+}
 
 export function initialiseResponseStore(files: FileList | undefined) {
-    hashIndexLookup.clear();
-    processedCount.set(0);
-    perfectCount.set(0);
-    warningCount.set(0);
-    badCount.set(0);
-    unknownCount.set(0);
-    responseStore.set(Array.from(files || []).map(file => <ResponseEntry> {filename: file.name, status: "queued", content: null}));
+	hashIndexLookup.clear();
+	processedCount.set(0);
+	perfectCount.set(0);
+	warningCount.set(0);
+	badCount.set(0);
+	unknownCount.set(0);
+	responseStore.set(
+		Array.from(files || []).map(
+			(file) => <ResponseEntry>{ filename: file.name, status: 'queued', content: null }
+		)
+	);
 }
 
 export function inputChanged(from: string | null) {
@@ -31,8 +48,16 @@ export function inputChanged(from: string | null) {
 	oldController.abort();
 	fetchController.set(newController);
 
-	initialiseResponseStore(get(fileListStore));
-	getRipInfoMpMulti(from, get(fileListStore), newController.signal);
+	const files = get(fileListStore);
+	initialiseResponseStore(files);
+	processing.set(files?.length === 1);
+	getRipInfoMpMulti(from, files, newController.signal);
+
+	// Routing follows the act of choosing files. Deciding it from the file list
+	// instead meant the list outliving a navigation sent you back to /logs.
+	if (files && files.length > 1 && location.pathname !== '/logs') {
+		goto(`${removeRoute(location.pathname, from)}/logs`);
+	}
 }
 
 export function updateUnknown() {

@@ -1,8 +1,8 @@
-import type { SegmentDetails } from "./SegmentDetails";
+import type { SegmentDetails } from './SegmentDetails';
 
 export interface LaneDetails {
-    radius: number,
-    segmentSize: number,
-    segmentGap: number,
-    segments: SegmentDetails[],
+	radius: number;
+	segmentSize: number;
+	segmentGap: number;
+	segments: SegmentDetails[];
 }

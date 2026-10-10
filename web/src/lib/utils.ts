@@ -1,4 +1,3 @@
-import type { ToastSettings, ToastStore } from '@skeletonlabs/skeleton';
 import anime from 'animejs';
 import Color from 'colorjs.io';
 import type { CambiaResponse } from './types/CambiaResponse';
@@ -25,26 +24,34 @@ export function toCardId(header: string): string {
 	return header.trim().replaceAll(' ', '-').toLowerCase() + '-card';
 }
 
-export function copySuccess(toastStore: ToastStore) {
-	const t: ToastSettings = {
-		message: 'Copied to clipboard',
-		background: 'variant-glass-primary',
-		timeout: 3000
-	};
-	toastStore.trigger(t);
-}
-
-export function showError(toastStore: ToastStore, err: CambiaError) {
-	const t: ToastSettings = {
-		message: err.message,
-		background: 'variant-glass-error',
-		timeout: 3000
-	};
-	toastStore.trigger(t);
+/**
+ * Copies text, reporting success so the caller can show it in place.
+ *
+ * Prefers `clipboard.write` with a ClipboardItem: a bare `writeText` call
+ * matches the ClickFix scam pattern and gets blocked by uBlock Origin and
+ * similar content blockers.
+ */
+export async function copyToClipboard(value: string): Promise<boolean> {
+	try {
+		if (navigator.clipboard.write) {
+			await navigator.clipboard.write([
+				new ClipboardItem({ 'text/plain': new Blob([value], { type: 'text/plain' }) })
+			]);
+		} else {
+			await navigator.clipboard.writeText(value);
+		}
+		return true;
+	} catch {
+		return false;
+	}
 }
 
 export function getCssColor(cssVar: string): Color {
-	return new Color(`rgb(${getComputedStyle(document.body).getPropertyValue('--' + cssVar)})`);
+	return new Color(
+		getComputedStyle(document.documentElement)
+			.getPropertyValue('--' + cssVar)
+			.trim()
+	);
 }
 
 export function getCssColorHex(cssVar: string): string {
@@ -97,14 +104,14 @@ export function getScoreVariant(score: string): string {
 		const numScore = parseFloat(score);
 		switch (true) {
 			case numScore == 100:
-				return 'variant-soft-success';
+				return 'preset-tonal-success';
 			case numScore >= 50:
-				return 'variant-soft-warning';
+				return 'preset-tonal-warning';
 			case numScore < 50:
-				return 'variant-soft-error';
+				return 'preset-tonal-error';
 		}
 	}
-	return 'variant-soft-surface';
+	return 'preset-tonal-surface';
 }
 
 export function getInfoOverviewPopoverText(miniName: string) {
@@ -127,7 +134,7 @@ export function clientError(message: string, id: Array<number> = []): MessageEve
 		message
 	};
 	const packed = packr.pack(err);
-	return new MessageEvent('message', { data: new Blob([packed]) });
+	return new MessageEvent('message', { data: new Blob([new Uint8Array(packed)]) });
 }
 
 export function isCambiaResponse(res: CambiaResponse | CambiaError): res is CambiaResponse {
