@@ -237,6 +237,22 @@ impl TrackError {
             missing_samples: TrackErrorData::new_from_bool(m_s),
         }
     }
+
+    pub fn new_ezcd(read: TrackErrorData, jitter_generic: TrackErrorData, damaged_sectors: TrackErrorData, inconsistent_err_sectors: TrackErrorData) -> Self {
+        TrackError {
+            read,
+            skip: TrackErrorData::default(),
+            jitter_generic,
+            jitter_edge: TrackErrorData::default(),
+            jitter_atom: TrackErrorData::default(),
+            drift: TrackErrorData::default(),
+            dropped: TrackErrorData::default(),
+            duplicated: TrackErrorData::default(),
+            damaged_sectors,
+            inconsistent_err_sectors,
+            missing_samples: TrackErrorData::default(),
+        }
+    }
 }
 
 impl TrackErrorData {
