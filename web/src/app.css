@@ -3,6 +3,10 @@
 @plugin '@tailwindcss/forms';
 @plugin '@tailwindcss/typography';
 
+/* The AccurateRip summary picks its column count at runtime; a CD has at most
+   99 tracks, so at most 10 columns. */
+@source inline('grid-cols-{1..10}');
+
 @import './cambia-theme.css';
 
 /*

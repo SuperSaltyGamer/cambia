@@ -26,7 +26,7 @@
 	});
 </script>
 
-<div class="grid grid-cols-{column} gap-2" id="deco-grid">
+<div class="grid grid-cols-10 gap-2" id="deco-grid">
 	{#each Array(row) as _}
 		{#each Array(column) as _}
 			<div class={classNames('w-4 h-4 deco-grid-el', color)}></div>

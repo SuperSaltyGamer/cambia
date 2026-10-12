@@ -11,7 +11,6 @@
 	let { tracks }: Props = $props();
 	let selectedTrack = $state(0);
 
-	const boxSize = 8;
 	const n = $derived(Math.ceil(Math.sqrt(tracks.length)));
 	const n_sq = $derived(n * n);
 
@@ -32,14 +31,6 @@
 		}
 	}
 
-	function gridGenerator(cols: number): string {
-		return `grid-template-columns: repeat(${cols}, minmax(0, 1fr));`;
-	}
-
-	function cubeGenerator(): string {
-		return `width: ${boxSize / n}rem; height: ${boxSize / n}rem;`;
-	}
-
 	function clickHandler(idx: number) {
 		if (idx < tracks.length) {
 			selectedTrack = idx;
@@ -51,7 +42,7 @@
 	<!-- TODO: Check if the styles can be done via TW -->
 	<!-- TODO: Add a tab group for v1/v2 -->
 	<div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-		<div class="grid place-self-start self-center md:justify-self-center" style={gridGenerator(n)}>
+		<div class="grid grid-cols-{n} w-32 place-self-start self-center md:justify-self-center">
 			{#each Array(n_sq) as _, trackIdx}
 				{@const ars = tracks[trackIdx]?.ar_info}
 				{@const ar = ars ? ars[ars.length - 1] : undefined}
@@ -59,8 +50,7 @@
 				<div
 					class="{getColor(
 						ar?.status
-					)} hover:bg-success-400 hover:cursor-pointer text-center text-xs content-center"
-					style={cubeGenerator()}
+					)} aspect-square hover:bg-success-400 hover:cursor-pointer text-center text-xs content-center"
 					onkeydown={Function.prototype()}
 					onclick={() => {
 						clickHandler(trackIdx);
