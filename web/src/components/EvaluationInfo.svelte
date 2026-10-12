@@ -74,9 +74,9 @@
 								kind: 'scope',
 								scope: scope,
 								children: unitsByScope[scope].evaluation_units.map(
-									(unit) =>
+									(unit, idx) =>
 										({
-											id: `${unitsByScope[scope].slug}-${slugify(unit.data.field)}`,
+											id: `${unitsByScope[scope].slug}-${slugify(unit.data.field)}-${idx}`,
 											kind: 'unit',
 											unit: unit
 										}) as EvalNode
